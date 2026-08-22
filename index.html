@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>SERVIO — Protótipo</title>
-  <link rel="stylesheet" href="./prototipo/style.css">
+  <link rel="stylesheet" href="./prototipo/style.css    ">
   <script src="./prototipo/scripts.js" defer></script>
 </head>
 <body>
@@ -54,31 +54,36 @@
       </section>
 
       <!-- HOME -->
-      <section class="screen" id="screen-home">
-        <div class="greet" id="homeGreet">Olá, Edmara</div>
-        <div class="greet-sub">Sábado, 17 de agosto · Praça do Arco · Sobral-CE</div>
+      <section class="screen screen-fixed" id="screen-home">
+        <div class="screen-head">
+          <div class="greet" id="homeGreet">Olá, Edmara</div>
+          <div class="greet-sub">Sábado, 17 de agosto · Praça do Arco · Sobral-CE</div>
 
-        <div class="hero-fatura" id="statFaturado">
-          <div class="hero-fatura-label"><i class="fa-solid fa-sack-dollar"></i> FATURADO HOJE</div>
-          <div class="hero-fatura-value" id="statFaturadoVal">R$ 640</div>
+          <div class="hero-fatura" id="statFaturado">
+            <div class="hero-fatura-label"><i class="fa-solid fa-sack-dollar"></i> FATURADO HOJE</div>
+            <div class="hero-fatura-value" id="statFaturadoVal">R$ 640</div>
+          </div>
+
+          <div class="stat-row-2">
+            <div class="stat2">
+              <div class="stat2-top"><i class="fa-solid fa-users"></i> <span id="statCountLbl">Atendimentos</span></div>
+              <div class="stat2-bottom"><span class="stat2-num" id="statCount">14</span><span class="stat2-lbl">Hoje</span></div>
+            </div>
+            <div class="stat2 accent-warn">
+              <div class="stat2-top"><i class="fa-regular fa-clock"></i> Em andamento</div>
+              <div class="stat2-bottom"><span class="stat2-num" id="statAndamento">3</span><span class="stat2-lbl">Ativos</span></div>
+            </div>
+          </div>
+
+          <div class="section-head"><h3>Atendimentos ativos</h3><a onclick="go('ativos')">ver todos</a></div>
         </div>
 
-        <div class="stat-row-2">
-          <div class="stat2">
-            <div class="stat2-top"><i class="fa-solid fa-users"></i> <span id="statCountLbl">Atendimentos</span></div>
-            <div class="stat2-bottom"><span class="stat2-num" id="statCount">14</span><span class="stat2-lbl">Hoje</span></div>
-          </div>
-          <div class="stat2 accent-warn">
-            <div class="stat2-top"><i class="fa-regular fa-clock"></i> Em andamento</div>
-            <div class="stat2-bottom"><span class="stat2-num" id="statAndamento">3</span><span class="stat2-lbl">Ativos</span></div>
-          </div>
+        <div class="screen-scroll" id="homeScroll">
+          <div id="homeAtList"></div>
+          <div class="empty-hint" id="homeEmptyHint" style="display:none;">Você não tem atendimentos ativos no momento.</div>
         </div>
 
-        <div class="section-head"><h3>Atendimentos ativos</h3><a onclick="go('ativos')">ver todos</a></div>
-        <div id="homeAtList"></div>
-        <div class="empty-hint" id="homeEmptyHint" style="display:none;">Você não tem atendimentos ativos no momento.</div>
-
-        <div class="fab-row">
+        <div class="screen-foot">
           <button class="btn-primary" onclick="go('novo')"><i class="fa-solid fa-plus"></i> Novo atendimento</button>
         </div>
       </section>
@@ -116,7 +121,7 @@
           <div class="empty-hint" id="pacoteAtendimentoEmpty" style="display:none;">Nenhum pacote com tempo fixo disponível. Ative a opção no Cadastro de Pacotes.</div>
         </div>
 
-        <div class="field"><i class="fa-regular fa-user"></i><input placeholder="Nome da criança (opcional)"></div>
+        <div class="field"><i class="fa-regular fa-user"></i><input id="novoClienteInput" placeholder="Nome da criança (opcional)"></div>
 
         <div class="summary-bar">
           <div><div class="lbl">Valor estimado</div><div class="val" id="estVal">R$ 18,00</div></div>
@@ -127,40 +132,47 @@
       </section>
 
       <!-- ATENDIMENTOS ATIVOS / HISTORICO -->
-      <section class="screen" id="screen-ativos">
-        <h2 class="title" id="ativosTitle">Atendimentos ativos</h2>
-        <p class="sub" id="ativosSub">Toque em um card para pausar, estender, antecipar ou finalizar.</p>
+      <section class="screen screen-fixed" id="screen-ativos">
+        <div class="screen-head">
+          <h2 class="title" id="ativosTitle">Atendimentos ativos</h2>
+          <p class="sub" id="ativosSub">Toque em um card para pausar, estender, antecipar ou finalizar.</p>
 
-        <div class="chip-row" style="margin-bottom:14px;">
-          <button class="chip sel" data-view="ativos" onclick="setAtivosView('ativos', this)">Ativos</button>
-          <button class="chip" data-view="historico" onclick="setAtivosView('historico', this)">Histórico</button>
+          <div class="chip-row" style="margin-bottom:12px;">
+            <button class="chip sel" data-view="ativos" onclick="setAtivosView('ativos', this)">Ativos</button>
+            <button class="chip" data-view="historico" onclick="setAtivosView('historico', this)">Histórico</button>
+          </div>
         </div>
 
-        <div id="ativosListFull"></div>
-        <div class="empty-hint" id="ativosEmptyHint" style="display:none;">Nenhum atendimento seu no momento.</div>
+        <div class="screen-scroll" id="ativosScroll">
+          <div id="ativosListFull"></div>
+          <div class="empty-hint" id="ativosEmptyHint" style="display:none;">Nenhum atendimento seu no momento.</div>
 
-        <div id="historicoBox" style="display:none;">
-          <div class="filter-label">Período</div>
-          <div class="chip-row" id="histPeriodChips">
-            <button class="chip" data-p="hoje" onclick="setHistPeriod('hoje', this)">Hoje</button>
-            <button class="chip sel" data-p="7dias" onclick="setHistPeriod('7dias', this)">Últimos 7 dias</button>
-            <button class="chip" data-p="13dias" onclick="setHistPeriod('13dias', this)">Últimos 13 dias</button>
-            <button class="chip" data-p="custom" onclick="setHistPeriod('custom', this)">Personalizado</button>
+          <div id="historicoBox" style="display:none;">
+            <div class="filter-label">Período</div>
+            <div class="chip-row" id="histPeriodChips">
+              <button class="chip" data-p="hoje" onclick="setHistPeriod('hoje', this)">Hoje</button>
+              <button class="chip sel" data-p="7dias" onclick="setHistPeriod('7dias', this)">Últimos 7 dias</button>
+              <button class="chip" data-p="custom" onclick="setHistPeriod('custom', this)">Personalizado</button>
+            </div>
+            <div class="date-range" id="histDateRange">
+              <div class="df"><label>De</label><input type="date" id="histDateStart" onchange="renderHistorico()"></div>
+              <div class="df"><label>Até</label><input type="date" id="histDateEnd" onchange="renderHistorico()"></div>
+            </div>
+
+            <div id="histMonitorSection">
+              <div class="filter-label">Monitor</div>
+              <div class="chip-row" id="histMonitorChips"></div>
+            </div>
+
+            <div id="historicoListFull" style="margin-top:6px;"></div>
+            <div class="empty-hint" id="historicoEmptyHint" style="display:none;">Nenhum atendimento finalizado neste período.</div>
+
+            <button class="pdf-btn" onclick="generateHistPdf()"><i class="fa-solid fa-file-pdf"></i> Gerar PDF do histórico</button>
           </div>
-          <div class="date-range" id="histDateRange">
-            <div class="df"><label>De</label><input type="date" id="histDateStart" onchange="renderHistorico()"></div>
-            <div class="df"><label>Até</label><input type="date" id="histDateEnd" onchange="renderHistorico()"></div>
-          </div>
+        </div>
 
-          <div id="histMonitorSection">
-            <div class="filter-label">Monitor</div>
-            <div class="chip-row" id="histMonitorChips"></div>
-          </div>
-
-          <div id="historicoListFull" style="margin-top:6px;"></div>
-          <div class="empty-hint" id="historicoEmptyHint" style="display:none;">Nenhum atendimento finalizado neste período.</div>
-
-          <button class="pdf-btn" onclick="generateHistPdf()"><i class="fa-solid fa-file-pdf"></i> Gerar PDF do histórico</button>
+        <div class="screen-foot" id="ativosFoot">
+          <button class="btn-primary" onclick="go('novo')"><i class="fa-solid fa-plus"></i> Novo atendimento</button>
         </div>
       </section>
 
@@ -285,36 +297,40 @@
       </section>
 
       <!-- LOCACOES (gestor) - CRUD -->
-      <section class="screen" id="screen-locacoes">
-        <h2 class="title">Gestão de Locações</h2>
+      <section class="screen screen-fixed" id="screen-locacoes">
+        <div class="screen-head">
+          <h2 class="title">Gestão de Locações</h2>
 
-        <div class="loc-filter-row">
-          <button class="loc-filter sel" data-f="todas" onclick="setLocFilter('todas', this)">Todas</button>
-          <button class="loc-filter" data-f="confirmadas" onclick="setLocFilter('confirmadas', this)">Confirmadas</button>
-          <button class="loc-filter" data-f="analise" onclick="setLocFilter('analise', this)">Em análise</button>
+          <div class="loc-filter-row">
+            <button class="loc-filter sel" data-f="todas" onclick="setLocFilter('todas', this)">Todas</button>
+            <button class="loc-filter" data-f="confirmadas" onclick="setLocFilter('confirmadas', this)">Confirmadas</button>
+            <button class="loc-filter" data-f="analise" onclick="setLocFilter('analise', this)">Em análise</button>
+          </div>
         </div>
 
-        <div id="locsList"></div>
-        <div class="empty-hint" id="locsEmptyHint" style="display:none;">Nenhuma locação neste filtro.</div>
+        <div class="screen-scroll" id="locacoesScroll">
+          <div id="locsList"></div>
+          <div class="empty-hint" id="locsEmptyHint" style="display:none;">Nenhuma locação neste filtro.</div>
 
-        <div class="reg-form" id="locForm" style="display:none;">
-          <div class="form-title" id="locFormTitle">Nova locação</div>
-          <div class="field"><i class="fa-solid fa-cake-candles"></i><input id="locEvento" placeholder="Nome do evento (ex: Festa da Maria - 6 anos)"></div>
-          <div class="field"><i class="fa-regular fa-user"></i><input id="locCliente" placeholder="Nome do cliente"></div>
-          <div class="field"><i class="fa-solid fa-phone"></i><input id="locTelefone" placeholder="Telefone / WhatsApp"></div>
-          <div class="field"><i class="fa-regular fa-calendar"></i><input type="date" id="locData"></div>
-          <div class="field"><i class="fa-regular fa-clock"></i><input id="locHorario" placeholder="Horário (ex: 15h–19h)"></div>
-          <div class="filter-label" style="margin-top:0;">Brinquedos / combo</div>
-          <div class="multi-chip-row" id="locToyChips"></div>
-          <div class="field"><i class="fa-solid fa-sack-dollar"></i><input id="locValor" placeholder="Valor total (ex: 150,00)"></div>
-          <div class="filter-label" style="margin-top:0;">Status</div>
-          <div class="chip-row" id="locStatusChips">
-            <button class="chip sel" data-s="Em análise" onclick="pickLocStatus(this)">Em análise</button>
-            <button class="chip" data-s="Confirmada" onclick="pickLocStatus(this)">Confirmada</button>
-          </div>
-          <div class="form-actions" style="margin-top:12px;">
-            <button class="btn-primary" onclick="saveLoc()">Salvar locação</button>
-            <button class="btn-ghost" onclick="closeLocForm()"><i class="fa-solid fa-xmark"></i></button>
+          <div class="reg-form" id="locForm" style="display:none;">
+            <div class="form-title" id="locFormTitle">Nova locação</div>
+            <div class="field"><i class="fa-solid fa-cake-candles"></i><input id="locEvento" placeholder="Nome do evento (ex: Festa da Maria - 6 anos)"></div>
+            <div class="field"><i class="fa-regular fa-user"></i><input id="locCliente" placeholder="Nome do cliente"></div>
+            <div class="field"><i class="fa-solid fa-phone"></i><input id="locTelefone" placeholder="Telefone / WhatsApp"></div>
+            <div class="field"><i class="fa-regular fa-calendar"></i><input type="date" id="locData"></div>
+            <div class="field"><i class="fa-regular fa-clock"></i><input id="locHorario" placeholder="Horário (ex: 15h–19h)"></div>
+            <div class="filter-label" style="margin-top:0;">Brinquedos / combo</div>
+            <div class="multi-chip-row" id="locToyChips"></div>
+            <div class="field"><i class="fa-solid fa-sack-dollar"></i><input id="locValor" placeholder="Valor total (ex: 150,00)"></div>
+            <div class="filter-label" style="margin-top:0;">Status</div>
+            <div class="chip-row" id="locStatusChips">
+              <button class="chip sel" data-s="Em análise" onclick="pickLocStatus(this)">Em análise</button>
+              <button class="chip" data-s="Confirmada" onclick="pickLocStatus(this)">Confirmada</button>
+            </div>
+            <div class="form-actions" style="margin-top:12px;">
+              <button class="btn-primary" onclick="saveLoc()">Salvar locação</button>
+              <button class="btn-ghost" onclick="closeLocForm()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
           </div>
         </div>
       </section>

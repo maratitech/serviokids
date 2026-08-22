@@ -291,6 +291,31 @@ function finalizeFromRow(id){
   current = a;
   goToPaymentFromDetail(false);
 }
+let highlightAtendimentoId = null;
+let highlightTimer = null;
+/* Garante que a aba "Atendimentos" esteja na visão Ativos (e não em Histórico) */
+function forceAtivosView(){
+  repAtivosView = 'ativos';
+  document.querySelectorAll('#screen-ativos .chip-row .chip[data-view]').forEach(c=>
+    c.classList.toggle('sel', c.dataset.view==='ativos'));
+  document.getElementById('ativosListFull').style.display = 'block';
+  document.getElementById('historicoBox').style.display = 'none';
+  const footAtivos = document.getElementById('ativosFoot');
+  if(footAtivos) footAtivos.style.display = 'block';
+  document.getElementById('ativosTitle').textContent = 'Atendimentos ativos';
+  document.getElementById('ativosSub').textContent = 'Toque em um card para pausar, estender, antecipar ou finalizar.';
+}
+/* Destaca e rola até o atendimento recém-criado dentro da listagem */
+function highlightAtendimento(id){
+  highlightAtendimentoId = id;
+  clearTimeout(highlightTimer);
+  highlightTimer = setTimeout(()=>{ highlightAtendimentoId = null; renderAtLists(); }, 3000);
+  renderAtLists();
+  requestAnimationFrame(()=>{
+    const row = document.querySelector('#ativosListFull .at-row[data-id="'+id+'"]');
+    if(row && row.scrollIntoView) row.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+}
 function renderAtRowHTML(a, withActions){
   const pct = getPct(a);
   const remaining = getRemainingMin(a);
@@ -308,7 +333,8 @@ function renderAtRowHTML(a, withActions){
       '<button class="at-btn primary" onclick="event.stopPropagation();finalizeFromRow('+a.id+')"><i class="fa-solid fa-circle-check"></i> Finalizar</button>' +
     '</div>'
   ) : '';
-  return '<div class="at-row" data-op="'+a.op+'" onclick="openAtendimentoById('+a.id+')">' +
+  const newCls = (a.id===highlightAtendimentoId) ? ' at-new' : '';
+  return '<div class="at-row'+newCls+'" data-id="'+a.id+'" data-op="'+a.op+'" onclick="openAtendimentoById('+a.id+')">' +
     '<div class="at-row-top">' +
       atendimentoThumbTag(a,'at-thumb') +
       '<div class="at-info"><div class="toy">'+a.toy+' '+advTag+'</div>' +
@@ -334,12 +360,14 @@ function renderHistRowHTML(a){
 }
 function setAtivosView(view, el){
   repAtivosView = view;
-  document.querySelectorAll('#screen-ativos .chip-row .chip').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('#screen-ativos .chip-row .chip[data-view]').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   const isHist = view==='historico';
   document.getElementById('ativosListFull').style.display = isHist ? 'none':'block';
   document.getElementById('ativosEmptyHint').style.display = 'none';
   document.getElementById('historicoBox').style.display = isHist ? 'block':'none';
+  const foot = document.getElementById('ativosFoot');
+  if(foot) foot.style.display = isHist ? 'none':'block';
   document.getElementById('ativosTitle').textContent = isHist ? 'Histórico de atendimentos' : 'Atendimentos ativos';
   document.getElementById('ativosSub').textContent = isHist
     ? (currentRole==='monitor' ? 'Seus atendimentos já finalizados.' : 'Todos os atendimentos já finalizados.')
@@ -347,6 +375,9 @@ function setAtivosView(view, el){
   renderAtLists();
 }
 function renderAtLists(){
+  // as listagens rolam sozinhas e são redesenhadas a cada segundo: guarda a posição
+  const scrollEls = ['homeScroll','ativosScroll'].map(id=>document.getElementById(id)).filter(Boolean);
+  const scrollPos = scrollEls.map(el=>el.scrollTop);
   const isMonitor = currentRole==='monitor';
   let list = atendimentosAtivos.filter(a=>a.status==='ativo');
   if(isMonitor) list = list.filter(a=>a.op===currentUser.name);
@@ -370,6 +401,8 @@ function renderAtLists(){
   }
 
   if(repAtivosView==='historico') renderHistorico();
+
+  scrollEls.forEach((el,i)=>{ if(el.scrollTop!==scrollPos[i]) el.scrollTop = scrollPos[i]; });
 }
 
 /* ---------------- HISTORICO: filtros, agrupamento por dia, PDF ---------------- */
@@ -379,7 +412,6 @@ function getHistRange(){
   let start, end;
   if(histPeriod==='hoje'){ start = end = TODAY; }
   else if(histPeriod==='7dias'){ end = TODAY; start = new Date(TODAY); start.setDate(start.getDate()-6); }
-  else if(histPeriod==='13dias'){ end = TODAY; start = new Date(TODAY); start.setDate(start.getDate()-12); }
   else {
     const sv = document.getElementById('histDateStart').value;
     const ev = document.getElementById('histDateEnd').value;
@@ -557,7 +589,8 @@ function updateEstimate(){
   document.querySelector('#screen-novo .pill').innerHTML = '<i class="fa-regular fa-clock"></i> '+min+' min';
 }
 function startAtendimento(){
-  const clienteInput = document.querySelector('#screen-novo .field input');
+  const clienteInput = document.getElementById('novoClienteInput')
+    || document.querySelector('#screen-novo input[placeholder^="Nome da criança"]');
   const cliente = clienteInput ? clienteInput.value.trim() : '';
   const now = new Date();
   const horaInicio = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
@@ -584,9 +617,11 @@ function startAtendimento(){
   record.alertPlayed = false;
   record.data = TODAY.toISOString().slice(0,10);
   atendimentosAtivos.unshift(record);
+  if(clienteInput) clienteInput.value = '';
   showToast('Atendimento iniciado.');
-  renderAtLists();
+  forceAtivosView();          // se a aba estava em Histórico, o novo atendimento ficava invisível
   go('ativos');
+  highlightAtendimento(record.id);
 }
 /* ---------------- ATENDIMENTO DETAIL ---------------- */
 let current = null;
